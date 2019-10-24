@@ -5,6 +5,8 @@ const uuid = require('uuid/v4');//unique id with timestamp
 
 const app = express();
 
+app.use(express.static('Front'));
+
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extend: false}));
@@ -12,21 +14,21 @@ app.use(bodyParser.urlencoded({ extend: false}));
 let listPosts = [
     {
         id: uuid(),
-        title: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        title: "Lorem ipsum dolor sit amet",
         content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
         author: "Angel Treviño",
         publishDate: new Date()
     },
     {
         id: uuid(),
-        title: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        title: "Lorem ipsum",
         content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Mi tempus imperdiet nulla malesuada pellentesque elit. Urna et pharetra pharetra massa massa ultricies mi. Magna sit amet purus gravida quis blandit. Dignissim diam quis enim lobortis scelerisque. Eu mi bibendum neque egestas congue. Purus sit amet volutpat consequat mauris nunc congue nisi vitae. In tellus integer feugiat scelerisque varius morbi enim nunc faucibus. Eu augue ut lectus arcu bibendum at. Adipiscing elit duis tristique sollicitudin nibh sit. Nascetur ridiculus mus mauris vitae ultricies.",
         author: "Noe Campos",
         publishDate: new Date()
     },
     {
         id: uuid(),
-        title: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        title: "Lorem ipsum dolor sit amet",
         content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Mi tempus imperdiet nulla malesuada pellentesque elit. Urna et pharetra pharetra massa massa ultricies mi. Magna sit amet purus gravida quis blandit. Dignissim diam quis enim lobortis scelerisque. Eu mi bibendum neque egestas congue. Purus sit amet volutpat consequat mauris nunc congue nisi vitae. In tellus integer feugiat scelerisque varius morbi enim nunc faucibus. Eu augue ut lectus arcu bibendum at. Adipiscing elit duis tristique sollicitudin nibh sit. Nascetur ridiculus mus mauris vitae ultricies.",
         author: "Caro Peyrot",
         publishDate: new Date()

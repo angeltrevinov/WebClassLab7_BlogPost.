@@ -1,0 +1,31 @@
+.card {
+    margin: 25px;
+}
+
+.card-subtitle {
+    display: flex;
+    flex-direction: row;
+}
+
+h6 {
+    margin-right: auto;
+}
+
+.Buttons {
+    text-align: end;
+}
+
+.Buttons > button {
+    margin: 5px;
+}
+
+.AlertContainter {
+    position:fixed;
+    bottom: 0px;
+    width: 100%;
+    z-index:9999;
+}
+
+.AlertContainter > .alert {
+    margin: 10px;
+}
