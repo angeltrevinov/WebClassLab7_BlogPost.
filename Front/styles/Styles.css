@@ -29,3 +29,19 @@ h6 {
 .AlertContainter > .alert {
     margin: 10px;
 }
+
+.SearchContainer {
+    display: flex;
+    flex-direction: row;
+    margin: 20px;
+}
+
+.SearchContainer > input {
+    width: 80%;
+    margin-right: 5px;
+}
+
+.SearchContainer > button {
+    width: 20%;
+    margin-left: 5px;
+}

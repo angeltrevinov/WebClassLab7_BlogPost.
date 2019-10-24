@@ -50,14 +50,14 @@ app.get('/api/blog-post', (req, res, next) => {
         });
     }
 
-    let post = listPosts.find((post) => {
+    let posts = listPosts.filter((post) => {
         return post.author.toLowerCase().includes(
             req.query.author.toLowerCase()
         );
     });
 
-    if(post) {
-        return res.status(200).json(post);
+    if(posts.length > 0) {
+        return res.status(200).json(posts);
     } else {
         return res.status(404).json({
             error: 'No author found'
