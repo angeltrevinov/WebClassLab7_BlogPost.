@@ -1,3 +1,5 @@
+let arrPosts = [];
+
 //----------------------------------------------------------
 function getPosts() {
     let listPosts = [];
@@ -5,6 +7,7 @@ function getPosts() {
         url: '/api/blog-posts',
         method: 'GET'
     }).done((result) => {
+        arrPosts = result;
         listPosts = _preparePosts(result);
         $('#ListOfPosts').append(listPosts);
     });
@@ -52,7 +55,7 @@ function addPost() {
         title: $('#Title').val(),
         content: $('#Content').val(),
         author: $('#Author').val(),
-        publishDate: new Date(),
+        publishDate: $('#Date').val(),
     };
 
     $.ajax({
@@ -74,8 +77,71 @@ function addPost() {
 }
 
 //----------------------------------------------------------
+function editPost(postId) {
+
+    let Post = {
+        id: postId,
+        title: $('#Title').val(),
+        content: $('#Content').val(),
+        author: $('#Author').val(),
+        publishDate: $('#Date').val(),
+    };
+
+    $.ajax({
+        url: '/api/blog-posts/' + postId,
+        method: 'PUT',
+        data: Post
+    }).done((result) => {
+        addAlert(result.message, 'success');
+        $('#AddModal').modal('hide');
+        $('#ListOfPosts').empty();
+        getPosts();
+    }).fail((error) =>  {
+        addAlert(
+            error.status + " " + error.responseJSON.error,
+            'danger'
+        );
+    });
+}
+
+//----------------------------------------------------------
+function onEditPost(postId) {
+
+    $('#ModalFooter').append(
+        '<button type="button" class="btn btn-primary" onclick="editPost(\''+ postId + '\')">Edit Post</button>'
+    );
+
+    let post = arrPosts.find((post) => {
+        return post.id === postId;
+    });
+
+    $('#Title').val(post.title);
+    $('#Content').val(post.content);
+    $('#Author').val(post.author);
+
+    var local = new Date(post.publishDate);
+    local.setMinutes(local.getMinutes() - local.getTimezoneOffset());
+    local.toJSON().slice(0,10);
+    $('#Date').val(local.toJSON().slice(0,10));
+
+}
+
+//----------------------------------------------------------
 $('#modalAdd').on('click', () => {
-    $('#Date').val(new Date().toJSON().slice(0,10));
+    var local = new Date();
+    local.setMinutes(local.getMinutes() - local.getTimezoneOffset());
+    local.toJSON().slice(0,10);
+    $('#Date').val(local.toJSON().slice(0,10));
+
+    $('#ModalFooter').append(
+        '<button type="button" class="btn btn-primary" onclick="addPost()">Add Post</button>'
+    );
+});
+
+//----------------------------------------------------------
+$('#ListOfPosts').on('click', '#Edit', () => {
+    $('#ModalTitle').empty();
+    $('#ModalTitle')[0].innerHTML = 'Modify Post!'
 });
 
 //----------------------------------------------------------
@@ -89,11 +155,11 @@ function _preparePosts(posts) {
             '<h4 class="card-title">'+ post.title+'</h4>' +
             '<div class="card-subtitle mb-2 text-muted">' +
             '<h6>'+ post.author +'</h6>' +
-            '<h6>'+ date.toLocaleTimeString() + " "+ date.toDateString() +'</h6>' +
+            '<h6>'+ date.toLocaleTimeString() + " "+ date.toLocaleDateString() +'</h6>' +
             '</div>'+
             '<p>'+ post.content +'</p>'+
             '<div class="Buttons">' +
-            '<button id="Edit" type="button" class="btn btn-primary">EDIT</button>'+
+            '<button id="Edit" type="button" class="btn btn-primary" onclick="onEditPost(\''+ post.id + '\')" data-toggle="modal" data-target="#AddModal">EDIT</button>'+
             '<button id="Delete" type="button" class="btn btn-danger" onclick="deletePost(\''+ post.id + '\')">DELETE</button>'+
             '</div>'+
             '</div>' +
@@ -117,11 +183,25 @@ function addAlert(strMessage, strType) {
 }
 
 //----------------------------------------------------------
+$('#AddModal').on('hidden.bs.modal', () => {
+    _emptyFormFields();
+});
+
+//----------------------------------------------------------
 function _dissmissAlert() {
     $(".alert").fadeTo(2000, 500).slideUp(500, function(){
         $(".alert").slideUp(500);
         $('.AlertContainter').empty();
     });
+}
+
+//----------------------------------------------------------
+function _emptyFormFields() {
+    $('#Title').val("");
+    $('#Content').val("");
+    $('#Author').val("");
+    $('#Date').val("");
+    $('#ModalFooter')[0].childNodes[3].remove();
 }
 
 getPosts();

@@ -25,12 +25,12 @@
     <div class="AlertContainter">
     </div>
 
-    <!-- Modal -->
+    <!--Add Modal -->
     <div class="modal fade" id="AddModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalCenterTitle">Create a Post!</h5>
+                    <h5 class="modal-title" id="ModalTitle">Create a Post!</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -56,14 +56,13 @@
                         <div class="form-group row">
                             <label for="Date" class="col-sm-3 col-form-label">Publish Date:</label>
                             <div class="col-sm-9">
-                                <input type="date" class="form-control" id="Date" readonly>
+                                <input type="date" class="form-control" id="Date">
                             </div>
                         </div>
                     </form>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer" id="ModalFooter">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="addPost()">Add Modal</button>
                 </div>
             </div>
         </div>
