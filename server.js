@@ -3,7 +3,9 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const uuid = require('uuid/v4');//unique id with timestamp
 
+
 const app = express();
+const port = process.env.PORT || 3000;
 
 app.use(express.static('Front'));
 
@@ -160,6 +162,6 @@ app.put('/api/blog-posts/:id', (req, res, next) => {
 });
 
 //----------------------------------------------------------
-app.listen('8080', () => {
+app.listen(port, () => {
     console.log('App running on local host');
 });
