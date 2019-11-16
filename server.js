@@ -1,11 +1,19 @@
 const express = require('express');
 const morgan = require('morgan');
+const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const uuid = require('uuid/v4');//unique id with timestamp
-
+const {DATABASE_URL} = require('./config');
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+//connection to mongoDB
+mongoose.connect(DATABASE_URL)
+    .then(() => {
+        console.log('Connected to our database');
+    }).catch(() => {
+    console.log('connection failed');
+});
 
 app.use(express.static('Front'));
 
@@ -13,34 +21,19 @@ app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extend: false}));
 
-let listPosts = [
-    {
-        id: uuid(),
-        title: "Lorem ipsum dolor sit amet",
-        content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-        author: "Angel Treviño",
-        publishDate: new Date()
-    },
-    {
-        id: uuid(),
-        title: "Lorem ipsum",
-        content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Mi tempus imperdiet nulla malesuada pellentesque elit. Urna et pharetra pharetra massa massa ultricies mi. Magna sit amet purus gravida quis blandit. Dignissim diam quis enim lobortis scelerisque. Eu mi bibendum neque egestas congue. Purus sit amet volutpat consequat mauris nunc congue nisi vitae. In tellus integer feugiat scelerisque varius morbi enim nunc faucibus. Eu augue ut lectus arcu bibendum at. Adipiscing elit duis tristique sollicitudin nibh sit. Nascetur ridiculus mus mauris vitae ultricies.",
-        author: "Noe Campos",
-        publishDate: new Date()
-    },
-    {
-        id: uuid(),
-        title: "Lorem ipsum dolor sit amet",
-        content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Mi tempus imperdiet nulla malesuada pellentesque elit. Urna et pharetra pharetra massa massa ultricies mi. Magna sit amet purus gravida quis blandit. Dignissim diam quis enim lobortis scelerisque. Eu mi bibendum neque egestas congue. Purus sit amet volutpat consequat mauris nunc congue nisi vitae. In tellus integer feugiat scelerisque varius morbi enim nunc faucibus. Eu augue ut lectus arcu bibendum at. Adipiscing elit duis tristique sollicitudin nibh sit. Nascetur ridiculus mus mauris vitae ultricies.",
-        author: "Caro Peyrot",
-        publishDate: new Date()
-    }
-];
+
+const Post = require('./models/blog-post-model');
 
 //get all posts
 //----------------------------------------------------------
 app.get('/api/blog-posts', (req, res, next) => {
-    return res.status(200).json(listPosts);
+    Post.find().then((result) => {
+        return res.status(200).json(result);
+    }).catch((error) => {
+        return res.status(500).json({
+            error: error
+        });
+    });
 });
 
 //Find post by author /api/blog-post?author=<value>
@@ -52,19 +45,21 @@ app.get('/api/blog-post', (req, res, next) => {
         });
     }
 
-    let posts = listPosts.filter((post) => {
-        return post.author.toLowerCase().includes(
-            req.query.author.toLowerCase()
-        );
+    Post.find({
+        author: req.query.author
+    }).then((result) => {
+        if(result.length > 0) {
+            return res.status(200).json(result);
+        } else{
+            return res.status(404).json({
+                error: "no author was found"
+            });
+        }
+    }).catch((error) => {
+        return res.status(500).json({
+            error: "no author found"
+        })
     });
-
-    if(posts.length > 0) {
-        return res.status(200).json(posts);
-    } else {
-        return res.status(404).json({
-            error: 'No author found'
-        });
-    }
 });
 
 //----------------------------------------------------------
@@ -81,18 +76,21 @@ app.post('/api/blog-posts', (req, res, next) => {
         publishDate && publishDate !== " ") {
 
         let newPost = {
-            id: uuid(),
             title: title,
             content: content,
             author: author,
             publishDate: publishDate
         };
 
-        listPosts.push(newPost);
-
-        return res.status(201).json({
-            message: 'Added Post!'
-        });
+        Post.create(newPost).then((result) => {
+            return res.status(201).json({
+                message: 'Added Post!'
+            });
+        }).catch((error) => {
+            return res.status(500).json({
+                error: error
+            });
+        })
     } else {
         return res.status(406).json({
             error: 'Missing a field'
@@ -102,21 +100,18 @@ app.post('/api/blog-posts', (req, res, next) => {
 
 //----------------------------------------------------------
 app.delete('/api/blog-posts/:id', (req, res, next) => {
-    let post = listPosts.findIndex(post => {
-        return post.id === req.params.id;
-    });
 
-    if(post !== -1) {
-        console.log(post);
-        listPosts.splice(post, 1);
+    Post.findByIdAndRemove({
+        _id: req.params.id
+    }).then((result) => {
         return res.status(200).json({
             message: 'post deleted'
         });
-    } else {
+    }).catch((error) => {
         return res.status(404).json({
             error: 'post not found'
         });
-    }
+    });
 });
 
 //----------------------------------------------------------
@@ -136,28 +131,24 @@ app.put('/api/blog-posts/:id', (req, res, next) => {
         });
     }
 
-    let post = listPosts.find(post => {
-        return post.id === req.params.id;
-    });
+    let newPost = {
+        author: req.body.author,
+        title: req.body.title,
+        content: req.body.content,
+        publishDate: req.body.publishDate
+    };
 
-    if(req.body.author && req.body.author !== ' ') {
-        post.author = req.body.author;
-    }
-
-    if(req.body.title && req.body.title !== ' '){
-        post.title = req.body.title;
-    }
-
-    if(req.body.content && req.body.content !== ' '){
-        post.content = req.body.content;
-    }
-
-    if(req.body.publishDate && req.body.publishDate) {
-        post.publishDate = req.body.publishDate;
-    }
-
-    return res.status(202).json({
-        message: 'Post updated!'
+    Post.findByIdAndUpdate(
+        {_id: req.body.id},
+        newPost
+    ).then((result) => {
+        return res.status(200).json({
+            message: 'Post updated successfully'
+        });
+    }).catch((error) => {
+        return res.status(500).json({
+            error: error
+        });
     });
 });
 

@@ -7,6 +7,7 @@ function getPosts() {
         url: '/api/blog-posts',
         method: 'GET'
     }).done((result) => {
+        console.log(result);
         arrPosts = result;
         listPosts = _preparePosts(result);
         $('#ListOfPosts').append(listPosts);
@@ -159,8 +160,8 @@ function _preparePosts(posts) {
             '</div>'+
             '<p>'+ post.content +'</p>'+
             '<div class="Buttons">' +
-            '<button id="Edit" type="button" class="btn btn-primary" onclick="onEditPost(\''+ post.id + '\')" data-toggle="modal" data-target="#AddModal">EDIT</button>'+
-            '<button id="Delete" type="button" class="btn btn-danger" onclick="deletePost(\''+ post.id + '\')">DELETE</button>'+
+            '<button id="Edit" type="button" class="btn btn-primary" onclick="onEditPost(\''+ post._id + '\')" data-toggle="modal" data-target="#AddModal">EDIT</button>'+
+            '<button id="Delete" type="button" class="btn btn-danger" onclick="deletePost(\''+ post._id + '\')">DELETE</button>'+
             '</div>'+
             '</div>' +
             '</div>'
